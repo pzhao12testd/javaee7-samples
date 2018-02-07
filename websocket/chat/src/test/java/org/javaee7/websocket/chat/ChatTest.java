@@ -10,7 +10,6 @@ import javax.websocket.DeploymentException;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -28,7 +27,7 @@ public class ChatTest {
     @ArquillianResource
     URI base;
 
-    @Deployment()
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class)
             .addClasses(ChatEndpoint.class,
@@ -37,7 +36,6 @@ public class ChatTest {
     }
 
     @Test
-    @RunAsClient
     public void testConnect() throws URISyntaxException, DeploymentException, IOException, InterruptedException {
         ChatClientEndpoint1.latch = new CountDownLatch(1);
         final Session session1 = connectToServer(ChatClientEndpoint1.class);

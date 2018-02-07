@@ -1,30 +1,58 @@
-sudo: false
-language: java
-jdk:
-  - oraclejdk8
+before_cache:
+- rm -rf $HOME/CACHE; find $TRAVIS_BUILD_DIR -name .starts | while read line; do du
+  -sh $line;         DIR=$(dirname $HOME/CACHE$line); mkdir -p $DIR; cp -r $line $DIR;
+  done
+- find $TRAVIS_BUILD_DIR -name jdeps-cache | while read line; do du -sh $line;         DIR=$(dirname
+  $HOME/CACHE$line); mkdir -p $DIR; cp -r $line $DIR; done
+- echo CACHESIZE $(du -sk $HOME/CACHE)
+before_install:
+- find $HOME/CACHE -name jdeps-cache | while read line; do du -sh $line;         DIR=$(dirname
+  ${line#$HOME/CACHE}); if [[ -d ${DIR#jdeps-cache/} ]]; then cp -r $line $DIR; fi;
+  done
+- find $HOME/CACHE -name .starts | while read line; do du -sh $line;         DIR=$(dirname
+  ${line#$HOME/CACHE}); if [[ -d ${DIR#.starts/} ]]; then cp -r $line $DIR; fi; done
+before_script:
+- find $TRAVIS_BUILD_DIR -name .starts | while read line; do rm -rf $line; done
+- find $TRAVIS_BUILD_DIR -name jdeps-cache | while read line; do rm -rf $line; done
+- find $HOME/CACHE -name jdeps-cache | while read line; do du -sh $line;         DIR=$(dirname
+  ${line#$HOME/CACHE}); if [[ -d ${DIR#jdeps-cache/} ]]; then cp -r $line $DIR; fi;
+  done
+- find $HOME/CACHE -name .starts | while read line; do du -sh $line;         DIR=$(dirname
+  ${line#$HOME/CACHE}); if [[ -d ${DIR#.starts/} ]]; then cp -r $line $DIR; fi; done
+cache:
+  directories:
+  - $HOME/CACHE
 env:
-  - TESTFOLDER=batch
-  - TESTFOLDER=cdi
-  - TESTFOLDER=concurrency
-  - TESTFOLDER=ejb
-  - TESTFOLDER=el
-  - TESTFOLDER=interceptor
-  - TESTFOLDER=jacc
-  - TESTFOLDER=jaspic
-  - TESTFOLDER=javamail
-  - TESTFOLDER=jaxrs
-  - TESTFOLDER=jaxws
-  - TESTFOLDER=jca
-  - TESTFOLDER=jms
-  - TESTFOLDER=jpa
-  - TESTFOLDER=jsf
-  - TESTFOLDER=json
-  - TESTFOLDER=jta
-  - TESTFOLDER=servlet
-  - TESTFOLDER=validation
-  - TESTFOLDER=websocket
-  
-  
+- TESTFOLDER=batch
+- TESTFOLDER=cdi
+- TESTFOLDER=concurrency
+- TESTFOLDER=ejb
+- TESTFOLDER=el
+- TESTFOLDER=interceptor
+- TESTFOLDER=jacc
+- TESTFOLDER=jaspic
+- TESTFOLDER=javamail
+- TESTFOLDER=jaxrs
+- TESTFOLDER=jaxws
+- TESTFOLDER=jca
+- TESTFOLDER=jms
+- TESTFOLDER=jpa
+- TESTFOLDER=jsf
+- TESTFOLDER=json
+- TESTFOLDER=jta
+- TESTFOLDER=servlet
+- TESTFOLDER=validation
+- TESTFOLDER=websocket
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-
-script: mvn --batch-mode --fail-at-end --projects $TESTFOLDER --also-make-dependents install 2>&1 
+jdk:
+- oraclejdk8
+language: java
+script:
+- touch /tmp/NOW
+- echo GIBSTUDYSTART $(date)
+- mvn --batch-mode --fail-at-end --projects $TESTFOLDER --also-make-dependents install
+  2>&1
+- echo GIBSTUDYEND $(date)
+- cd $TRAVIS_BUILD_DIR
+- echo TESTNUM $(find . -name TEST-*.xml -newer /tmp/NOW | wc -l)
+sudo: false
