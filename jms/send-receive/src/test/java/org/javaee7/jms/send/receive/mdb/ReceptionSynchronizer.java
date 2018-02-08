@@ -56,8 +56,6 @@ public class ReceptionSynchronizer {
         synchronized (barrier) {
             if (barrier.containsKey(m)) {
                 latch = barrier.get(m);
-            } else {
-                barrier.put(m, new CountDownLatch(0));
             }
         }
         if (latch != null) {
@@ -65,7 +63,7 @@ public class ReceptionSynchronizer {
         }
     }
 
-    public static void waitFor(Class<?> clazz, String methodName, int timeoutInMillis) throws InterruptedException {
+    public static void waitFor(Class<?> clazz, String methodName) throws InterruptedException {
         Method method = null;
         for (Method declaredMethod : clazz.getDeclaredMethods()) {
             if (methodName.equals(declaredMethod.getName())) {
@@ -79,21 +77,27 @@ public class ReceptionSynchronizer {
         if (method == null) {
             throw new IllegalArgumentException(methodName + " not found in " + clazz.getSimpleName());
         }
-        waitFor(method, timeoutInMillis);
+        waitFor(method);
     }
 
-    private static void waitFor(Method method, int timeoutInMillis) throws InterruptedException {
+    private static void waitFor(Method method) throws InterruptedException {
         CountDownLatch latch;
         synchronized (barrier) {
             if (barrier.containsKey(method)) {
                 latch = barrier.get(method);
+                if (latch.getCount() == 0) {
+                    throw new IllegalStateException("The invocation already happened");
+                } else {
+                    throw new IllegalStateException("Sorry, I only serve the first one");
+                }
             } else {
                 latch = new CountDownLatch(1);
                 barrier.put(method, latch);
             }
         }
-        if (!latch.await(timeoutInMillis, TimeUnit.MILLISECONDS)) {
-            throw new AssertionError("Expected method has not been invoked in " + timeoutInMillis + "ms");
+        if (!latch.await(2, TimeUnit.SECONDS)) {
+            throw new AssertionError("Expected method has not been invoked");
         }
     }
+
 }

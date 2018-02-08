@@ -5,7 +5,6 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Before;
@@ -50,8 +49,7 @@ public class AnnotatedSingletonResourceTest {
         return ShrinkWrap.create(WebArchive.class)
             .addClasses(
                 MyAnnotatedApplication.class,
-                AnnotatedSingletonResource.class)
-            .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+                AnnotatedSingletonResource.class);
     }
 
     @Test

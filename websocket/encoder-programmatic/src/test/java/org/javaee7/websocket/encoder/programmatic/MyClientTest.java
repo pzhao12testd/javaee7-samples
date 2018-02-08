@@ -15,7 +15,6 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -31,7 +30,7 @@ public class MyClientTest {
     @ArquillianResource
     URI base;
 
-    @Deployment
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class)
             .addClasses(MyEndpoint.class,
@@ -42,7 +41,6 @@ public class MyClientTest {
     }
 
     @Test
-    @RunAsClient
     public void testEndpoint() throws URISyntaxException, DeploymentException, IOException, InterruptedException {
         final String JSON = "{\"apple\":\"red\",\"banana\":\"yellow\"}";
         Session session = connectToServer(MyClient.class);

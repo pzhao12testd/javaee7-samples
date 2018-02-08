@@ -12,7 +12,6 @@ import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -32,7 +31,7 @@ public class MyEndpointTest {
     @ArquillianResource
     URI base;
 
-    @Deployment
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class)
             .addClasses(MyEndpoint.class,
@@ -42,7 +41,6 @@ public class MyEndpointTest {
     }
 
     @Test
-    @RunAsClient
     public void testTextEndpoint() throws URISyntaxException, DeploymentException, IOException, InterruptedException {
         MyEndpointTextClient.latch = new CountDownLatch(1);
         final String TEXT = "Hello World!";
@@ -58,7 +56,6 @@ public class MyEndpointTest {
     }
 
     @Test
-    @RunAsClient
     public void testBinaryEndpoint() throws URISyntaxException, DeploymentException, IOException, InterruptedException {
         MyEndpointBinaryClient.latch = new CountDownLatch(1);
         final String TEXT = "Hello World!";
