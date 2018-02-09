@@ -39,13 +39,13 @@
  */
 package org.javaee7.jms.send.receive.simple;
 
-import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.jms.JMSContext;
 import javax.jms.JMSException;
-import javax.jms.JMSRuntimeException;
 import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 
@@ -53,7 +53,6 @@ import org.javaee7.jms.send.receive.Resources;
 
 /**
  * Synchronous message reception with container-managed JMSContext.
- *
  * @author Arun Gupta
  */
 @Stateless
@@ -65,30 +64,20 @@ public class MessageReceiverSync {
     @Resource(mappedName = Resources.SYNC_CONTAINER_MANAGED_QUEUE)
     Queue myQueue;
 
-    /**
-     * Waits to receive a message from the JMS queue. Times out after a given
-     * number of milliseconds.
-     *
-     * @param timeoutInMillis The number of milliseconds this method will wait
-     * before throwing an exception.
-     * @return The contents of the message.
-     * @throws JMSRuntimeException if an error occurs in accessing the queue.
-     * @throws TimeoutException if the timeout is reached.
-     */
-    public String receiveMessage(int timeoutInMillis) throws JMSRuntimeException, TimeoutException {
-        String message = context.createConsumer(myQueue).receiveBody(String.class, timeoutInMillis);
-        if (message == null) {
-            throw new TimeoutException("No message received after " + timeoutInMillis + "ms");
-        }
-        return message;
+    public String receiveMessage() {
+        return context.createConsumer(myQueue).receiveBody(String.class, 1000);
     }
 
-    public void receiveAll(int timeoutInMillis) throws JMSException {
+    public void receiveAll() {
         System.out.println("--> Receiving redundant messages ...");
-        QueueBrowser browser = context.createBrowser(myQueue);
-        while (browser.getEnumeration().hasMoreElements()) {
-            System.out.println("--> here is one");
-            context.createConsumer(myQueue).receiveBody(String.class, timeoutInMillis);
+        try {
+            QueueBrowser browser = context.createBrowser(myQueue);
+            while (browser.getEnumeration().hasMoreElements()) {
+                System.out.println("--> here is one");
+                context.createConsumer(myQueue).receiveBody(String.class, 1000);
+            }
+        } catch (JMSException ex) {
+            Logger.getLogger(MessageReceiverSync.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
