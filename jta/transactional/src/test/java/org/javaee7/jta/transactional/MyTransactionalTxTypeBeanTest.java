@@ -5,7 +5,6 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -19,9 +18,8 @@ import javax.transaction.TransactionalException;
 public class MyTransactionalTxTypeBeanTest {
     @Deployment
     public static Archive<?> deploy() {
-        Archive library = ShrinkWrap.create(JavaArchive.class)
+        return ShrinkWrap.create(JavaArchive.class)
             .addClass(MyTransactionalTxTypeBean.class);
-        return ShrinkWrap.create(WebArchive.class).addAsLibraries(library);
     }
 
     @Inject

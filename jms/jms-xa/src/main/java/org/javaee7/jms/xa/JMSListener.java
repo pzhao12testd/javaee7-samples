@@ -1,7 +1,6 @@
 package org.javaee7.jms.xa;
 
 import static java.util.logging.Level.SEVERE;
-import static org.javaee7.jms.xa.DeliveryStats.countDownLatch;
 
 import java.util.logging.Logger;
 
@@ -30,7 +29,6 @@ public class JMSListener implements MessageListener {
             logger.info("Message received (async): " + message.getBody(String.class));
             
             deliveryStats.messageDelivered();
-            countDownLatch.countDown();
         } catch (JMSException ex) {
             logger.log(SEVERE, null, ex);
         }

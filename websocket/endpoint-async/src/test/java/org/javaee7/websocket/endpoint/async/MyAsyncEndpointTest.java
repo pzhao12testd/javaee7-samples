@@ -19,7 +19,6 @@ import java.nio.ByteBuffer;
 import static com.jayway.awaitility.Awaitility.*;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.*;
-import org.jboss.arquillian.container.test.api.RunAsClient;
 
 /**
  *
@@ -33,7 +32,7 @@ public class MyAsyncEndpointTest {
     @ArquillianResource
     private URL base;
 
-    @Deployment
+    @Deployment(testable = false)
     public static WebArchive deploy() throws URISyntaxException {
         return ShrinkWrap.create(WebArchive.class)
             .addClass(MyAsyncEndpointText.class)
@@ -41,7 +40,6 @@ public class MyAsyncEndpointTest {
     }
 
     @Test
-    @RunAsClient
     public void shouldReceiveAsyncTextMessage() throws URISyntaxException, IOException, DeploymentException {
         MyAsyncEndpointTextClient endpoint = new MyAsyncEndpointTextClient();
         Session session = connectToEndpoint(endpoint, "text");
@@ -52,7 +50,6 @@ public class MyAsyncEndpointTest {
     }
 
     @Test
-    @RunAsClient
     public void shouldReceiveAsyncByteBufferMessage() throws URISyntaxException, IOException, DeploymentException {
         final ByteBuffer buffer = ByteBuffer.wrap(TEST_MESSAGE.getBytes());
         MyAsyncEndpointByteBufferClient endpoint = new MyAsyncEndpointByteBufferClient();
